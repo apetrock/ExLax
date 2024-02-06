@@ -13,3 +13,4 @@ Quick and dirty project to serve MP4 files from npm and render them using Threej
 - instead of serving in file system order, allow user provide a manifest/playlist
 - set duration in playlist, maybe globally
 - one could potentially add more transition styles... but that would be making this thing too complicated
+- remove dependency on threejs and react.  This would probably benefit from bare webgl and a static index page.
