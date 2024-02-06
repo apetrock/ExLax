@@ -1,4 +1,4 @@
-# Smooth Fade
+# ExLax
 
 Quick and dirty project to serve MP4 files from npm and render them using Threejs.
 
