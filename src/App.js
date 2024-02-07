@@ -25,9 +25,7 @@ function App() {
   const divTargetRef = useRef(1);
   const [vlist, setVlist] = useState([]);
   const vlist_fetched = useRef(false);
-
-  const [fade, setFade] = useState(0.0);
-  const [textureRoute, setTextureRoute] = useState({ texture: null, index: 0 });
+  const queue_reload = useRef(false);
   const videoFaderRef = useRef(null);
   const [width, height] = useWindowSize();
 
@@ -45,6 +43,16 @@ function App() {
   }
 
   useEffect(() => {
+    const timer = setTimeout(() => {
+
+      queue_reload.current = true;
+    }, 60 * 60 * 1000); // Refresh after 1 hour
+
+    // Cleanup function to clear the timeout if the component unmounts
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
     fetch_vlist();
   }, []);
 
@@ -59,11 +67,15 @@ function App() {
       videoFaderRef.current.setWindowSize(width, height);
     }
   }, [width, height]);
-  
+
   function load_next() {
 
     let next_src = `http://localhost:5000/video/${vlist[videoIndex.current]}`;
     console.log("loading next 1: ", divTargetRef.current, next_src)
+    
+    if( queue_reload.current ) {
+      window.location.reload();
+    }
 
     if (divTargetRef.current === 0) {
       setVSrc1(next_src);
@@ -84,7 +96,7 @@ function App() {
     video.addEventListener('ended', on_end);
     video.next_loaded = false;
     video.div = divTargetRef.current;
-    
+
     videoFaderRef.current.setVideoTexture(video, divTargetRef.current);
   }
 
