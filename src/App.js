@@ -1,7 +1,20 @@
 import logo from './logo.svg';
 import './App.css';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { VideoFaderComponent, VideoFader } from './video_fader';
+
+function useWindowSize() {
+  const [size, setSize] = useState([0, 0]);
+  useLayoutEffect(() => {
+    function updateSize() {
+      setSize([window.innerWidth, window.innerHeight]);
+    }
+    window.addEventListener('resize', updateSize);
+    updateSize();
+    return () => window.removeEventListener('resize', updateSize);
+  }, []);
+  return size;
+}
 
 function App() {
 
@@ -16,6 +29,7 @@ function App() {
   const [fade, setFade] = useState(0.0);
   const [textureRoute, setTextureRoute] = useState({ texture: null, index: 0 });
   const videoFaderRef = useRef(null);
+  const [width, height] = useWindowSize();
 
   const fetch_vlist = async () => {
     if (vlist_fetched.current) return;
@@ -39,6 +53,13 @@ function App() {
     load_next();
   }, [vlist]);
 
+  useEffect(() => {
+    console.log("window size: ", width, height);
+    if (videoFaderRef.current) {
+      videoFaderRef.current.setWindowSize(width, height);
+    }
+  }, [width, height]);
+  
   function load_next() {
 
     let next_src = `http://localhost:5000/video/${vlist[videoIndex.current]}`;
@@ -63,6 +84,7 @@ function App() {
     video.addEventListener('ended', on_end);
     video.next_loaded = false;
     video.div = divTargetRef.current;
+    
     videoFaderRef.current.setVideoTexture(video, divTargetRef.current);
   }
 

@@ -3,12 +3,12 @@ import React, { useEffect, useRef, useState } from 'react';
 
 class VideoFader {
     time = 0;
-
+    aspect = 1.0;
     constructor() {
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         this.camera.position.z = 5;
-        
+
         this.uniforms = {
             uTexture1: { value: null },
             uTexture2: { value: null },
@@ -17,6 +17,14 @@ class VideoFader {
 
         this.renderer = new THREE.WebGLRenderer();
         this.renderer.setSize(window.innerWidth, window.innerHeight);
+
+        // Fetch clear color from component CSS
+        const componentElement = document.querySelector('.VideoFaderComponent');
+        const computedStyle = window.getComputedStyle(componentElement);
+        const clearColor = computedStyle.backgroundColor;
+        //this.renderer.setClearColor(clearColor);
+        this.renderer.setClearColor(0x000000);
+        
 
         const vertexShader = `
             varying vec2 vUv;
@@ -51,13 +59,10 @@ class VideoFader {
         });
 
         const mesh = new THREE.Mesh(geometry, material);
+        mesh.position.set(0, 0, 0); // Center the mesh
         this.scene.add(mesh);
-        
+
         this.animate = this.animate.bind(this);
-
-    }
-
-    initRenderer(canvas) {
 
     }
 
@@ -72,6 +77,10 @@ class VideoFader {
     }
 
     setVideoTexture(video, index) {
+        let width = video.videoWidth;
+        let height = video.videoHeight;
+        this.setAspectRatio(width, height);
+
         let oldTexture;
         let newTexture = new THREE.VideoTexture(video);
         newTexture.minFilter = THREE.LinearFilter;
@@ -88,7 +97,6 @@ class VideoFader {
             this.videoTexture1 = newTexture;
             this.uniforms.uTexture2.value = newTexture;
         }
-        console.log("setting video texture: ", index, newTexture);
 
         if (oldTexture) {
             oldTexture.dispose();
@@ -104,6 +112,23 @@ class VideoFader {
         this.renderer.setSize(rect.width, rect.height);
         //document.body.appendChild(this.renderer.domElement );
         canvas.appendChild(this.renderer.domElement);
+    }
+
+    setAspectRatio(width, height) {
+        this.aspect = width / height;
+        this.camera.aspect = this.aspect;
+        this.camera.updateProjectionMatrix();
+        this.setWindowSize(window.innerWidth, window.innerHeight);
+    }
+
+    setWindowSize(width, height) {
+        let twidth = height * this.aspect;
+        let theight = width / this.aspect;
+        if (twidth > width) {
+            this.renderer.setSize(width, theight);
+        } else {
+            this.renderer.setSize(twidth, height);
+        }
     }
 
     start() {
@@ -124,13 +149,13 @@ class VideoFader {
 
 }
 
-const VideoFaderComponent = ({ videoFader,textureRoute, fade}) => {
+const VideoFaderComponent = ({ videoFader, textureRoute, fade }) => {
     const canvasRef = useRef(null);
     const videoFaderRef = useRef(null);
 
     useEffect(() => {
         if (!videoFader) return;
-        videoFaderRef.current =videoFader;
+        videoFaderRef.current = videoFader;
         videoFaderRef.current.bindToCanvas(canvasRef.current);
 
         // Start the animation
