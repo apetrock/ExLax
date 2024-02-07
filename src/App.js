@@ -115,6 +115,9 @@ function App() {
     let video = e.target;
     video.removeEventListener('timeupdate', time_update);
     video.removeEventListener('ended', on_end);
+    video.src = "";
+    if (video.parentNode)
+      video.parentNode.removeChild(video);
   }
 
   return (

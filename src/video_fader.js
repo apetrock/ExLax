@@ -14,7 +14,7 @@ class VideoFader {
             uTexture2: { value: null },
             fade: { value: 0.0 }
         };
-
+        this.then = 0;
         this.renderer = new THREE.WebGLRenderer();
         this.renderer.setSize(window.innerWidth, window.innerHeight);
 
@@ -22,9 +22,9 @@ class VideoFader {
         const componentElement = document.querySelector('.VideoFaderComponent');
         const computedStyle = window.getComputedStyle(componentElement);
         const clearColor = computedStyle.backgroundColor;
-        //this.renderer.setClearColor(clearColor);
-        this.renderer.setClearColor(0x000000);
-        
+        this.renderer.setClearColor(clearColor);
+        //this.renderer.setClearColor(0x000000);
+
 
         const vertexShader = `
             varying vec2 vUv;
@@ -142,9 +142,17 @@ class VideoFader {
         this.animating = null;
     }
 
-    animate() {
+  
+    animate(now) {
+        const fps = 30; // Desired frames per second
+        const interval = 1000 / fps; // Interval in milliseconds
         this.animating = requestAnimationFrame(this.animate);
-        this.renderer.render(this.scene, this.camera);
+        const delta = now - this.then;
+        if (delta > interval) {
+            // Update time
+            this.then = now - (delta % interval);
+            this.renderer.render(this.scene, this.camera);
+        }
     }
 
 }
