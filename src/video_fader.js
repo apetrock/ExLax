@@ -1,10 +1,17 @@
 import * as THREE from 'three';
 import React, { useEffect, useRef, useState } from 'react';
+import e from 'cors';
 
 class VideoFader {
     time = 0;
     aspect = 1.0;
+    target_fade = 0.0;
+    current_fade = 0.0;
+    fade_direction = 0;
+    fade_duration = 1000;
+
     constructor() {
+
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         this.camera.position.z = 5;
@@ -103,7 +110,27 @@ class VideoFader {
         }
     }
 
+    setGoalFade(target_fade, fade_duration) {
+        this.target_fade = target_fade;
+        this.fade_direction = target_fade > this.current_fade ? 1 : -1;
+        this.fade_duration = fade_duration * 1000;
+    }
+
+    computeFade(interval) {
+        let clamp = (t, a, b) => {
+            return Math.max(Math.min(t, b), a);
+        }
+        let df = interval / this.fade_duration * this.fade_direction;
+        this.current_fade = this.current_fade + df;
+        //this.fade_direction = this.current_fade > 1.0 ? 0.0 : this.fade_direction;
+        //this.fade_direction = this.current_fade < 0.0 ? 0.0 : this.fade_direction;
+        this.current_fade = clamp(this.current_fade, 0.0, 1.0);
+        this.setFade(this.current_fade);
+    }
+
     setFade(t) {
+        //console.log("setting fade: ", t);
+        this.current_fade = t;
         this.uniforms.fade.value = t;
     }
 
@@ -148,6 +175,8 @@ class VideoFader {
         const interval = 1000 / fps; // Interval in milliseconds
         this.animating = requestAnimationFrame(this.animate);
         const delta = now - this.then;
+        if (!now) return;
+        this.computeFade(delta);
         if (delta > interval) {
             // Update time
             this.then = now - (delta % interval);

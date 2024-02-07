@@ -96,16 +96,20 @@ function App() {
 
     let fade_duration = 5.0;
     let t_trans = duration - fade_duration;
+    /*
+    //naively fading in the time update is a bit jittery
+    //so set a goal fade on the video fader instead
     if (ctime > t_trans && video.div != divTargetRef.current) {
-      
       let t_dur = fade_duration - (duration - ctime);
       let t = t_dur / fade_duration;
       t = divTargetRef.current === 1 ? t : 1.0 - t;
       videoFaderRef.current.setFade(t);
     }
-
+    */
     if (ctime > t_trans && !video.next_loaded) {
       video.next_loaded = true;
+      let fade_goal = divTargetRef.current === 1 ? 0.0 : 1.0;
+      videoFaderRef.current.setGoalFade(fade_goal, fade_duration);
       load_next();
     }
     return true;
