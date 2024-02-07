@@ -1,0 +1,14 @@
+{
+    "apps": [
+        {
+            "name": "xlax-app",
+            "script": "npm",
+            "args" : "run start"
+        },
+        {
+            "name": "xlax-server",
+            "script": "npm",
+            "args" : "run server"
+        }
+    ]
+}
