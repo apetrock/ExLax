@@ -28,6 +28,21 @@ function App() {
   const queue_reload = useRef(false);
   const videoFaderRef = useRef(null);
   const [width, height] = useWindowSize();
+  const fullscreenButtonRef = useRef(null);
+  const isFullscreen = useRef(false);
+  const goFullscreen = () => {
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen();
+    } else if (document.documentElement.mozRequestFullScreen) { // Firefox
+      document.documentElement.mozRequestFullScreen();
+    } else if (document.documentElement.webkitRequestFullscreen) { // Chrome, Safari and Opera
+      document.documentElement.webkitRequestFullscreen();
+    } else if (document.documentElement.msRequestFullscreen) { // IE/Edge
+      document.documentElement.msRequestFullscreen();
+    }
+    isFullscreen.current = true;
+    fullscreenButtonRef.current.style.display = 'none';
+  };
 
   const fetch_vlist = async () => {
     if (vlist_fetched.current) return;
@@ -65,6 +80,8 @@ function App() {
     console.log("window size: ", width, height);
     if (videoFaderRef.current) {
       videoFaderRef.current.setWindowSize(width, height);
+      if(!document.fullscreenElement)
+        fullscreenButtonRef.current.style.display = 'block';
     }
   }, [width, height]);
 
@@ -145,6 +162,7 @@ function App() {
         <video src={vSrc1} crossOrigin="anonymous" style={{ display: 'none' }} muted
           onLoadedData={on_load} />
         <VideoFaderComponent videoFader={videoFaderRef.current} ></VideoFaderComponent>
+        <button ref={fullscreenButtonRef} onClick={goFullscreen} style={{position: 'absolute', top: 0, right: 0}}>Go Fullscreen</button>
       </header>
     </div>
   );
