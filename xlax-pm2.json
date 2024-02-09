@@ -3,7 +3,7 @@
         {
             "name": "xlax-app",
             "script": "npm",
-            "args" : "run start"
+            "args" : "run start-fullscreen"
         },
         {
             "name": "xlax-server",

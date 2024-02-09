@@ -13,9 +13,12 @@
   },
   "scripts": {
     "server": "node server.js",
+    "start-fullscreen": "BROWSER='chromium-fullscreen.sh' react-scripts start",
     "start": "react-scripts start",
     "start-all": "pm2 start xlax-pm2.json",
     "stop-all": "pm2 stop xlax-pm2.json",
+    "start-all-production": "pm2 start xlax-pm2-production.json",
+    "stop-all-production": "pm2 stop xlax-pm2-production.json",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
