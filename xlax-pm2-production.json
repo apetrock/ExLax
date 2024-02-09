@@ -1,0 +1,18 @@
+{
+    "apps": [
+        {
+            "name": "xlax-app-production",
+            "script": "serve",
+            "args": "build",
+            "exec_mode" : "cluster_mode"
+        },
+        {
+            "name": "xlax-server-production",
+            "script": "server.js",
+            "watch": true,
+            "env": {
+                "PORT": 5000
+            }
+        }
+    ]
+}
